@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>crud</title>
+</head>
+<body>
+  <%=token%>
+  <h1>Get Items</h1>
+  <label for="">token</label>
+  <input type="text" id="token" name="token"><br><br>
+  <button onclick="sendRequest()">Send GET Request</button>
+  <div>
+    <table>
+        <tr><th>id</th>
+        <th>name</th>
+        <th>description</th>
+    </tr>
+    <tbody id="output">
+
+    </tbody>
+    </table>
+  </div>
+  <h1>
+    Post Items
+</h1>
+<input type="text" id="token2" name="token2" placeholder="token">
+<input type="text" id="name2" name="name2" placeholder="name">
+<input type="text" id="description" name="description" placeholder="description">
+<button onclick="sendPostRequest()">Send Request</button>
+<div id="postItemOutput"></div>
+<h1>send update request</h1>
+<input type="text" id="token3" name="token3" placeholder="token">
+<input type="id" id="id" name="id" placeholder="id">
+<input type="text" id="name3" name="name3" placeholder="name">
+<input type="text" id="description2" name="description2" placeholder="description">
+<button onclick="sendUpdateRequest()">Send Update Request</button>
+<div id="updateItemOutput"></div>
+<h1>Delete Request</h1>
+<input type="text" id="token4" name="token4" placeholder="token">
+<input type="id" id="id2" name="id2" placeholder="id">
+<button onclick="sendDeleteRequest()">Send Delete Request</button>
+<div id="deleteItemOutput"></div>
+<script>
+    function sendRequest() {
+    var tokenValue = document.getElementById("token").value;
+    console.log(tokenValue);
+    const headers=new Headers();
+    headers.append("Token",tokenValue)
+    headers.append('Content-Type', 'application/json')
+    const url ="/v1/item"
+    fetch(url, {
+        method: 'GET',
+        headers: headers
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+        document.getElementById("output").innerHTML=""
+        for(var i=0;i<data.length;i++)
+        {
+            document.getElementById("output").innerHTML+=`<tr><td>
+                ${data[i].id}</td>
+                <td>${data[i].name}</td>
+                <td>${data[i].description}</td></tr>`
+        }
+      })
+      .catch(error => {
+        // Handle errors
+        console.error('There was a problem with your fetch operation:', error);
+      });
+}
+function sendPostRequest(){
+    
+    var xhr = new XMLHttpRequest();
+
+    var url = '/v1/item'; 
+    var requestBody = {
+        name: document.getElementById("name2").value,
+        description: document.getElementById("description").value
+    }; 
+    var requestBodyString = JSON.stringify(requestBody);
+
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Token', document.getElementById("token2").value);
+    xhr.setRequestHeader("Content-Type","application/json")
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            if (xhr.status == 200) {
+                console.log(xhr.responseText);
+                document.getElementById("postItemOutput").innerHTML=xhr.responseText
+            } else {
+                console.error('Error:', xhr.status);
+            }
+        }
+};
+
+
+xhr.send(requestBodyString);
+
+}
+function sendUpdateRequest(){
+
+var xhr = new XMLHttpRequest();
+
+var url = '/v1/item'; 
+var queryParams = 'id='+document.getElementById("id").value; 
+var requestBody = {
+    name: document.getElementById("name3").value,
+    description: document.getElementById('description2').value
+};
+
+
+var requestBodyString = JSON.stringify(requestBody);
+
+xhr.open('PUT', url + '?' + queryParams, true);
+
+xhr.setRequestHeader('Content-type', 'application/json');
+xhr.setRequestHeader('Token',document.getElementById("token3").value)
+
+xhr.onreadystatechange = function () {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+        if (xhr.status == 200) {
+            // Request was successful
+            console.log(xhr.responseText); // Log the response
+            document.getElementById("updateItemOutput").innerHTML=xhr.responseText
+        } else {
+            // Request failed
+            console.error('Error:', xhr.status);
+        }
+    }
+};
+
+xhr.send(requestBodyString);
+}
+function sendDeleteRequest(){
+
+var xhr = new XMLHttpRequest();
+var url = '/v1/item'; 
+var queryParams = 'id='+document.getElementById("id2").value; 
+xhr.open('DELETE', url + '?' + queryParams, true);
+xhr.setRequestHeader('Content-type', 'application/json');
+xhr.setRequestHeader("Token",document.getElementById("token4").value)
+
+xhr.onreadystatechange = function () {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+        if (xhr.status == 200) {
+            console.log(xhr.responseText);
+            document.getElementById("deleteItemOutput").innerHTML=xhr.responseText
+        } else {
+            console.error('Error:', xhr.status);
+        }
+    }
+};
+
+xhr.send();
+
+}
+  </script>
+</body>
+</html>
