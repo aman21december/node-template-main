@@ -42,6 +42,12 @@
 <input type="id" id="id2" name="id2" placeholder="id">
 <button onclick="sendDeleteRequest()">Send Delete Request</button>
 <div id="deleteItemOutput"></div>
+
+<h1>File upload</h1>
+<form action="/v1/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="uploadFile">
+    <input type="submit" value="Upload">
+</form>
 <script>
     function sendRequest() {
     var tokenValue = document.getElementById("token").value;

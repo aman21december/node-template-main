@@ -5,6 +5,7 @@ const {itemController : item}=require('./item')
 const {postitemController}=require("./item")
 const {putitemController}=require("./item")
 const {deleteitemController} =require("./item")
+const {uploaditemController}=require("./upload")
 module.exports = {
   createApi,
   login,
@@ -12,5 +13,6 @@ module.exports = {
   item,
   postitemController,
   putitemController,
-  deleteitemController
+  deleteitemController,
+  uploaditemController
 };

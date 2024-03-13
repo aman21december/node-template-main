@@ -3,10 +3,26 @@ const sequelize = require("../../../config/db")
 const {QueryTypes} = require("sequelize")
 const  jwt =require('jsonwebtoken')
 const {getItems,postItems, putItems,deleteItems}=require('./sqlqueries')
-
+const joi=require("joi")
+const userSchema = joi.object({
+  name: joi.string().min(3).max(30).required(),
+  description: joi.string().min(3).max(30).required(),
+}); 
 class Item {
     constructor() {}
-
+    async validateUser(req, res, next) {
+      try {
+        const { error } = userSchema.validate(req.body);
+        if (error) {
+          console.log(error)
+          return error;
+         //res.status(400).json({ error: error.details[0].message });
+        }
+      } catch (error) {
+        console.error('Error validating user', error);
+        // res.status(500).json({ error: 'Internal server error' });
+      }
+    }
     async authenticateUser(req,res, next) {
         const token = req.header('Token');
         console.log(token)
@@ -42,10 +58,16 @@ class Item {
         try{
             console.log("item services are called");
             this.authenticateUser(req,res,next);
-            await postItems(req);
-            res.send("item registered")
-            console.log(result)
-        }
+            const error=await this.validateUser(req,res,next)
+            if(!error){
+              postItems(req);
+              res.send("item registered")
+            }        
+            else
+            {
+              res.send({ error: error.details[0].message })
+            }           
+          }
         catch (err){
             if(err.statusCodes) throw new ErrorHandler(err.statusCodes, err.message)
             throw new ErrorHandler(statusCodes.BAD_GATEWAY, err)
@@ -55,8 +77,15 @@ class Item {
       try{
         console.log("put item called")
         this.authenticateUser(req,res,next)
-        putItems(req.query.id,req.body)
-        res.send("Item Updated")
+        const error=await this.validateUser(req,res,next)
+        if(!error){
+          putItems(req.query.id,req.body)
+          res.send("Item Updated")
+        }
+        else
+        {
+          res.send({ error: error.details[0].message })
+        }        
       }
       catch (err){
         if(err.statusCodes) throw new ErrorHandler(err.statusCodes, err.message)
