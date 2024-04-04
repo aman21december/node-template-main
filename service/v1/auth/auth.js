@@ -15,6 +15,7 @@ const {getUsers}=require("./sqlqueries")
         name: Joi.string().min(3).max(30).required(),
         password: Joi.string().min(3).max(30).required(),
         email: Joi.string().email().required(),
+        role: Joi.string().min(3).max(30),
     });
   
     class Auth {
@@ -58,7 +59,7 @@ const {getUsers}=require("./sqlqueries")
                     if (item.email==email && bcrypt.compare(password,item.password))
                     {
                         bool=true;
-                        const token =jwt.sign({ userId: Math.random }, 'secret-key', { expiresIn: '1h' });
+                        const token =jwt.sign({ userId: item.Id,role:item.role }, 'secret-key', { expiresIn: '1h' });
                         console.log(token)
                        // res.status(200).json({ token });
                         res.render("getItem.ejs",{token:token})
@@ -81,9 +82,10 @@ const {getUsers}=require("./sqlqueries")
                 const error=await this.validateUser2(req,res,next)
                 if(!error){
                 console.log("signup services is called")          
-                const {name, email, password}=req.body;
+                const {name, email, password,role}=req.body;
+                console.log(role)
                 const hashedpassword=await bcrypt.hash(password,10);
-                postUsers(name,email,hashedpassword)
+                postUsers(name,email,hashedpassword,role)
                 res.send("user registed")   
                 }
                 else{

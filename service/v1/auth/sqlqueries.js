@@ -18,10 +18,10 @@ async function getUsers() {
     } catch (err) {
     }
 }
-async function postUsers(name,email,password){
+async function postUsers(name,email,password,role){
     console.log("postUser -- function")
     try{
-        const query = `insert into signup values ("null","${name}","${email}","${password}")`
+        const query = `insert into signup values ("null","${name}","${email}","${password}","${role}")`
         const result = await pool.execute(query);
         return result;
     }
